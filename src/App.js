@@ -1,23 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
+import FlowChart from './charts/FlowChart';
+import flowChartData from './data';
+
+const dimensions = {
+  width: 960,
+  height: 800,
+  margin: { top: 20, right: 120, bottom: 20, left: 350 },
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <FlowChart dimensions={dimensions} data={flowChartData} />
     </div>
   );
 }
