@@ -8,14 +8,14 @@ const FlowChart = ({ data, dimensions, showMore }) => {
   const svgHeight = height + margin.top + margin.bottom;
   const duration = 750,
     rectW = 60,
-    rectH = 30;
+    rectH = 20;
 
   useEffect(() => {
     // Create root container where we will append all other chart elements
     const svgEl = d3.select(svgRef.current);
     svgEl.selectAll('*').remove(); // Clear svg content before adding new elements
 
-    const zoom = d3.behavior.zoom().scaleExtent([1, 3]);
+    const zoom = d3.behavior.zoom();
     const svg = svgEl
       .call(zoom.on('zoom', redraw))
       .append('g')
@@ -29,7 +29,7 @@ const FlowChart = ({ data, dimensions, showMore }) => {
     });
 
     //necessary so that zoom knows where to zoom and un zoom from
-    zoom.translate([350, 20]);
+    zoom.translate([margin.left, margin.top]);
 
     const root = data;
     root.x0 = 0;
@@ -92,7 +92,7 @@ const FlowChart = ({ data, dimensions, showMore }) => {
         .attr('id', 'text')
         .style('text-align', 'center')
         // .style('vertical-align', 'middle')
-        .style('white-space', 'nowrap')
+        // .style('white-space', 'nowrap')
         .style('overflow', 'hidden')
         .style('text-overflow', 'ellipsis')
         .style('width', rectW + 'px')
