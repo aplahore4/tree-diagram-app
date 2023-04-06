@@ -1,27 +1,19 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-const FlowChart = ({ data, dimensions, getMoreData }) => {
+const FlowChart = ({ data, dimensions, showMore }) => {
   const svgRef = useRef(null);
   const { width, height, margin } = dimensions;
   const svgWidth = width + margin.left + margin.right;
   const svgHeight = height + margin.top + margin.bottom;
   const duration = 750,
-    rectW = 190,
-    rectH = 150;
+    rectW = 60,
+    rectH = 20;
 
   useEffect(() => {
     // Create root container where we will append all other chart elements
     const svgEl = d3.select(svgRef.current);
     svgEl.selectAll('*').remove(); // Clear svg content before adding new elements
-
-    const moreHandler = (d) => {
-      getMoreData(d);
-    };
-
-    const searchHandler = () => {
-      alert('searchHandler');
-    };
 
     const zoom = d3.behavior.zoom();
     const svg = svgEl
@@ -31,7 +23,7 @@ const FlowChart = ({ data, dimensions, getMoreData }) => {
 
     let i = 0;
 
-    const tree = d3.layout.tree().nodeSize([rectW + 5, rectH]);
+    const tree = d3.layout.tree().nodeSize([70, 40]);
     const diagonal = d3.svg.diagonal().projection(function (d) {
       return [d.x + rectW / 2, d.y + rectH / 2];
     });
@@ -51,11 +43,11 @@ const FlowChart = ({ data, dimensions, getMoreData }) => {
       }
     }
 
-    //root.children.forEach(collapse);
+    root.children.forEach(collapse);
     update(root);
     function update(source) {
       // Compute the new tree layout.
-      const nodes = tree.nodes(root).reverse(),
+      var nodes = tree.nodes(root).reverse(),
         links = tree.links(nodes);
 
       // Normalize for fixed-depth.
@@ -64,162 +56,127 @@ const FlowChart = ({ data, dimensions, getMoreData }) => {
       });
 
       // Update the nodes…
-      const node = svg.selectAll('g.node').data(
-        nodes.filter((node) => {
-          return node.depth > 0;
-        }),
-        function (d) {
-          return d.id || (d.id = ++i);
-        }
-      );
-
-      const parent_node = svg.selectAll('g.node').data(
-        nodes.filter((node) => {
-          return node.depth === 0;
-        }),
-        function (d) {
-          return d.id || (d.id = ++i);
-        }
-      );
+      var node = svg.selectAll('g.node').data(nodes, function (d) {
+        return d.id || (d.id = ++i);
+      });
 
       // Enter any new nodes at the parent's previous position.
-      const nodeEnter = node
+      var nodeEnter = node
         .enter()
         .append('g')
         .attr('class', 'node')
         .attr('transform', function (d) {
-          return 'translate(' + d.x + ',' + (+d.y + rectH / 2) + ')';
+          return 'translate(' + source.x0 + ',' + source.y0 + ')';
+        })
+        .on('click', click);
+
+      nodeEnter
+        .append('rect')
+        .attr('width', rectW)
+        .attr('height', rectH)
+        .style('stroke', 'gray')
+        .attr('stroke-width', 1)
+        .style('fill', function (d) {
+          return d._children ? 'lightsteelblue' : '#fff';
         });
 
-      const parent_nodeEnter = parent_node
-        .enter()
-        .append('g')
-        .attr('class', 'node')
-        .attr('transform', function (d) {
-          return 'translate(' + d.x + ',' + +d.y + ')';
-        });
-
-      const foreignObjectElement = nodeEnter
+      const div = nodeEnter
         .append('foreignObject')
         .attr('width', rectW)
         .attr('height', rectH)
+        //.attr('x', (-1 * rectWidth) / 2)
         .append('xhtml:div')
-        .attr('class', 'nod_div')
-        //.style('width', rectW - 1 + 'px')
-        //.style('height', rectH - 1 + 'px')
-        .style('border', '1px solid gray');
-      // .html(function (d) {
-      //   if (d._children) {
-      //     return `
-      //       <p>
-      //         ${d.name}
-      //         </p>
-      //         <input
-      //           type='button'
-      //           style='margin:0 0 10px 10px'
-      //           value='more'
-      //         />`;
-      //   } else {
-      //     return `
-      //     <div>
-      //       <input type='text' style='margin:10px' />
-      //       <div style='margin:0 0 10px 10px;border:1px solid red' onclick='${moreHandler}'>search</div>
-      //     </div>`;
-      //   }
-      // });
+        .attr('id', 'nod_div');
 
-      const parent_foreignObjectElement = parent_nodeEnter
-        .append('foreignObject')
-        .attr('width', rectW)
-        .attr('height', rectH)
-        .append('xhtml:div')
-        .attr('class', 'nod_div')
-        .style('border', '1px solid gray');
-
-      foreignObjectElement
-        .append('xhtml:div')
+      div
+        .append('xhtml:input')
+        .attr('id', 'node_input')
+        .style('text-align', 'center')
+        // .style('vertical-align', 'middle')
+        // .style('white-space', 'nowrap')
+        .style('overflow', 'hidden')
+        .style('text-overflow', 'ellipsis')
+        .style('width', rectW + 'px')
+        .style('display', 'inline-block')
+        .style('font-size', '12px')
+        .style('font-family', 'Calibri')
         .text(function (d) {
           return d.name;
         })
-        .style('margin', '10px');
-
-      foreignObjectElement
-        .append('xhtml:span')
-        .text('more')
-        .style('margin', 'margin:0 0 10px 10px')
-        .style('border', '1px solid red')
-        .on('click', moreHandler);
-
-      parent_foreignObjectElement
-        .append('xhtml:input')
-        .attr('type', 'text')
-        .style('margin', '10px');
-
-      parent_foreignObjectElement
-        .append('xhtml:span')
-        .text('search')
-        .style('margin', 'margin:0 0 10px 10px')
-        .style('border', '1px solid red')
-        .on('click', searchHandler);
-
-      // Transition nodes to their new position.
-      const nodeUpdate = node
-        .transition()
-        .duration(duration)
-        .attr('transform', function (d) {
-          return 'translate(' + d.x + ',' + (+d.y + rectH / 2) + ')';
+        .attr('title', function (d) {
+          return d.name;
         });
 
+      div
+        .append('xhtml:span')
+        .attr('id', 'node_text')
+        .style('text-align', 'center')
+        // .style('vertical-align', 'middle')
+        // .style('white-space', 'nowrap')
+        .style('overflow', 'hidden')
+        .style('text-overflow', 'ellipsis')
+        .style('width', rectW + 'px')
+        .style('display', 'inline-block')
+        .style('font-size', '12px')
+        .style('font-family', 'Calibri')
+        .text(function (d) {
+          return d.name;
+        })
+        .attr('title', function (d) {
+          return d.name;
+        });
+
+      // nodeEnter
+      //   .append('text')
+      //   .attr('x', rectW / 2)
+      //   .attr('y', rectH / 2)
+      //   .attr('dy', '.35em')
+      //   .attr('text-anchor', 'middle')
+      //   .text(function (d) {
+      //     return d.name;
+      //   });
+
       // Transition nodes to their new position.
-      const parent_nodeUpdate = parent_node
+      var nodeUpdate = node
         .transition()
         .duration(duration)
         .attr('transform', function (d) {
-          return 'translate(' + d.x + ',' + +d.y + ')';
+          return 'translate(' + d.x + ',' + d.y + ')';
         });
 
       nodeUpdate
-        .select('foreignObject')
+        .select('rect')
         .attr('width', rectW)
-        .attr('height', rectH);
+        .attr('height', rectH)
+        .style('stroke', 'gray')
+        .attr('stroke-width', 1)
+        .style('fill', function (d) {
+          return d._children ? 'lightsteelblue' : '#fff';
+        });
 
-      parent_nodeUpdate
-        .select('foreignObject')
-        .attr('width', rectW)
-        .attr('height', rectH);
+      nodeUpdate.select('text').style('fill-opacity', 1);
 
       // Transition exiting nodes to the parent's new position.
-      const nodeExit = node
+      var nodeExit = node
         .exit()
         .transition()
         .duration(duration)
         .attr('transform', function (d) {
-          return 'translate(' + d.x + ',' + (+d.y + rectH / 2) + ')';
-        })
-        .remove();
-
-      // Transition exiting nodes to the parent's new position.
-      const parent_nodeExit = parent_node
-        .exit()
-        .transition()
-        .duration(duration)
-        .attr('transform', function (d) {
-          return 'translate(' + d.x + ',' + +d.y + ')';
+          return 'translate(' + source.x + ',' + source.y + ')';
         })
         .remove();
 
       nodeExit
-        .select('foreignObject')
+        .select('rect')
         .attr('width', rectW)
-        .attr('height', rectH);
+        .attr('height', rectH)
+        .style('stroke', 'gray')
+        .attr('stroke-width', 1);
 
-      parent_nodeExit
-        .select('foreignObject')
-        .attr('width', rectW)
-        .attr('height', rectH);
+      nodeExit.select('text');
 
       // Update the links…
-      const link = svg.selectAll('path.link').data(links, function (d) {
+      var link = svg.selectAll('path.link').data(links, function (d) {
         return d.target.id;
       });
 
@@ -231,7 +188,7 @@ const FlowChart = ({ data, dimensions, getMoreData }) => {
         .attr('x', rectW / 2)
         .attr('y', rectH / 2)
         .attr('d', function (d) {
-          const o = {
+          var o = {
             x: source.x0,
             y: source.y0,
           };
@@ -250,7 +207,7 @@ const FlowChart = ({ data, dimensions, getMoreData }) => {
         .transition()
         .duration(duration)
         .attr('d', function (d) {
-          const o = {
+          var o = {
             x: source.x,
             y: source.y,
           };
