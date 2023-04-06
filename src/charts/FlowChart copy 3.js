@@ -108,25 +108,6 @@ const FlowChart = ({ data, dimensions, getMoreData }) => {
         //.style('width', rectW - 1 + 'px')
         //.style('height', rectH - 1 + 'px')
         .style('border', '1px solid gray');
-      // .html(function (d) {
-      //   if (d._children) {
-      //     return `
-      //       <p>
-      //         ${d.name}
-      //         </p>
-      //         <input
-      //           type='button'
-      //           style='margin:0 0 10px 10px'
-      //           value='more'
-      //         />`;
-      //   } else {
-      //     return `
-      //     <div>
-      //       <input type='text' style='margin:10px' />
-      //       <div style='margin:0 0 10px 10px;border:1px solid red' onclick='${moreHandler}'>search</div>
-      //     </div>`;
-      //   }
-      // });
 
       const parent_foreignObjectElement = parent_nodeEnter
         .append('foreignObject')

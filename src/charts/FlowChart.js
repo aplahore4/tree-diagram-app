@@ -18,7 +18,7 @@ const FlowChart = ({ dimensions, getMoreData }) => {
   const svgHeight = height + margin.top + margin.bottom;
   const duration = 750,
     rectW = 190,
-    rectH = 150;
+    rectH = 100;
 
   useEffect(() => {
     // Create root container where we will append all other chart elements
@@ -26,7 +26,7 @@ const FlowChart = ({ dimensions, getMoreData }) => {
     svgEl.selectAll('*').remove(); // Clear svg content before adding new elements
 
     const moreHandler = (d) => {
-      getMoreData(d);
+      alert('moreHandler');
     };
 
     const searchHandler = () => {
@@ -34,53 +34,105 @@ const FlowChart = ({ dimensions, getMoreData }) => {
     };
 
     const zoomBehavior = zoom();
+
     const svg = svgEl
       .call(zoomBehavior.on('zoom', redraw))
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // zoom.translate([margin.left, margin.top]);
-
-    const treemapLayout = tree()
+    const treeMapLayout = tree()
       .nodeSize([rectW, rectH])
-      .size([width, height / 2]);
+      .size([width, height - rectH]);
 
     const root = hierarchy(data);
 
-    treemapLayout(root);
+    const link_Vertical = linkVertical()
+      .x((d) => {
+        return d.x + rectW / 2;
+      })
+      .y((d) => {
+        return d.y;
+      });
+
+    treeMapLayout(root);
+
+    const parent_node_data = root.descendants().filter((node) => {
+      return node.depth === 0;
+    });
+    const node_data = root.descendants().filter((node) => {
+      return node.depth > 0;
+    });
 
     const link = svg
       .selectAll('.link')
       .data(root.links())
       .join('path')
       .attr('class', 'link')
-      .attr(
-        'd',
-        linkVertical()
-          .x((d) => d.x)
-          .y((d) => d.y)
-      );
+      .attr('d', link_Vertical);
 
     const node = svg
       .selectAll('.node')
-      .data(root.descendants())
+      .data(node_data)
       .join('g')
       .attr('class', 'node')
-      .attr('transform', (d) => `translate(${d.x},${d.y})`);
+      .attr('transform', (d) => {
+        return `translate(${d.x},${d.y})`;
+      });
 
-    node
-      .append('circle')
-      .attr('r', 4)
-      .attr('fill', '#fff')
-      .attr('stroke', '#000')
-      .attr('stroke-width', '1.5px');
+    const foreignObjectElement = node
+      .append('foreignObject')
+      .attr('width', rectW)
+      .attr('height', rectH)
+      .append('xhtml:div')
+      .attr('class', 'nod_div')
+      .style('border', '1px solid gray')
+      .style('background', 'white');
 
-    node
-      .append('text')
-      .attr('dy', '0.31em')
-      .attr('x', (d) => (d.children ? -6 : 6))
-      .attr('text-anchor', (d) => (d.children ? 'end' : 'start'))
-      .text((d) => d.data.name);
+    foreignObjectElement
+      .append('xhtml:div')
+      .text(function (d) {
+        return d.data.name;
+      })
+      .style('margin', '10px');
+
+    foreignObjectElement
+      .append('xhtml:span')
+      .text('more')
+      .style('margin', 'margin:0 0 10px 10px')
+      .style('border', '1px solid red')
+      .style('cursor', 'pointer')
+      .on('click', moreHandler);
+
+    const parent_node = svg
+      .selectAll('.parent_node')
+      .data(parent_node_data)
+      .join('g')
+      .attr('class', 'node')
+      .attr('transform', (d) => {
+        return `translate(${d.x},${d.y})`;
+      });
+
+    const parent_foreignObjectElement = parent_node
+      .append('foreignObject')
+      .attr('width', rectW)
+      .attr('height', rectH)
+      .append('xhtml:div')
+      .attr('class', 'nod_div')
+      .style('border', '1px solid gray')
+      .style('background', 'white');
+
+    parent_foreignObjectElement
+      .append('xhtml:input')
+      .attr('type', 'text')
+      .style('margin', '10px');
+
+    parent_foreignObjectElement
+      .append('xhtml:span')
+      .text('search')
+      .style('margin', 'margin:0 0 10px 10px')
+      .style('border', '1px solid red')
+      .style('cursor', 'pointer')
+      .on('click', searchHandler);
 
     //Redraw for zoom
     function redraw(event) {
