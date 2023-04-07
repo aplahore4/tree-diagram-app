@@ -34,7 +34,7 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .nodeSize([rectW, rectH])
       .size([width, height - rectH])
       .separation(function separation(a, b) {
-        return 0.00000001;
+        return 1 / 100000000;
       });
 
     const root = hierarchy(data);
@@ -78,24 +78,27 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .attr('height', rectH)
       .append('xhtml:div')
       .attr('class', 'nod_div')
-      .style('border', '1px solid gray')
-      .style('background', 'white');
+      .style('border', '1px solid #800080')
+      .style('background', 'white')
+      .style('font-size', '12px')
+      .style('font-family', 'Calibri');
 
     foreignObjectElement
       .append('xhtml:div')
       .text(function (d) {
         return d.data.name;
       })
-      .style('margin', '5px');
+      .style('margin', '0px');
 
     foreignObjectElement
       .append('xhtml:span')
-      .text('more')
-      .style('margin', 'margin:0 0 10px 10px')
-      .style('border', '1px solid red')
+      .text('Show More')
+      .style('padding', '1px')
+      // .style('float', 'right')
+      .style('border', '1px solid #800080')
       .style('cursor', 'pointer')
       .attr('data', function (d) {
-        return d.data.name;
+        return d.data.id;
         // return JSON.stringify({ ...d.data, depth: d.depth });
       })
       .on('click', function () {
@@ -118,23 +121,30 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .attr('height', rectH)
       .append('xhtml:div')
       .attr('class', 'nod_div')
-      .style('border', '1px solid gray')
-      .style('background', 'white');
+      .style('border', '1px solid #800080')
+      .style('background', 'white')
+      .style('font-size', '12px')
+      .style('font-family', 'Calibri');
 
     parent_foreignObjectElement
       .append('xhtml:input')
       .attr('type', 'text')
+      .attr('placeholder', 'Search stuffs')
       .style('width', '80px')
-      .style('margin', '5px');
+      .style('margin', '5px')
+      .style('padding', '2px')
+      .style('font-size', '12px')
+      .style('font-family', 'Calibri');
 
     parent_foreignObjectElement
       .append('xhtml:span')
-      .text('search')
-      .style('margin', 'margin:0 0 10px 10px')
-      .style('border', '1px solid red')
+      .text('Search')
+      .style('margin', '0 0 5px 5px')
+      .style('padding', '1px')
+      .style('border', '1px solid #800080')
       .style('cursor', 'pointer')
       .attr('data', function (d) {
-        return d.data.name;
+        return d.data.id;
         // return JSON.stringify({ ...d.data, depth: d.depth });
       })
       .on('click', function () {

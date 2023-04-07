@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import FlowChart from './charts/FlowChart';
 
 const dataset = {
   name: 'Root',
+  id: Date.now().toString(36) + '0',
 };
 
 function getCurrentDimension() {
@@ -12,30 +13,6 @@ function getCurrentDimension() {
     margin: { top: 0, right: 0, bottom: 0, left: 0 },
   };
 }
-const apiResponse = [
-  {
-    activity_name: 'Go-Karting',
-    short_description:
-      'Grab your friends, buckle up and race around the track as you battle it out to see who takes the checkered flag!',
-    location: 'Landon',
-    search_keywords: 'Go-Karting, Racing, Thrill',
-  },
-  {
-    activity_name: 'Virtual Reality Games',
-    short_description:
-      'Experience the newest virtual reality games and explore a new world, from the comfort of your own home!',
-    location: 'Landon',
-    search_keywords: 'Virtual Reality, VR Games, Immersive Experience',
-  },
-  {
-    activity_name: 'Pottery Making',
-    short_description:
-      'Unleash your creativity and learn the ancient art of pottery making. Create your own unique pottery pieces and take them home as souvenirs.',
-    location: 'Landon',
-    search_keywords: 'Pottery Making, DIY, Arts & Crafts',
-  },
-];
-
 function deepObjectSearchAndModify(obj, searchValue, modifyValue) {
   for (const key in obj) {
     if (typeof obj[key] === 'object') {
@@ -48,7 +25,6 @@ function deepObjectSearchAndModify(obj, searchValue, modifyValue) {
 }
 
 function App() {
-  //////////////////////////////////////////////
   const [data, setData] = useState(null);
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
 
@@ -67,23 +43,43 @@ function App() {
     };
   }, [screenSize]);
 
-  const getMoreData = (d) => {
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch(
+        'https://react-39886-default-rtdb.asia-southeast1.firebasedatabase.app/treeMap.json'
+      );
+      const data = await response.json();
+      return data.items;
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const getMoreData = async (d) => {
     debugger;
-    const modifyValue = [1, 2, 3].map((child, index) => {
+    const result = await fetchData();
+    const modifyValue = result.map((child, index) => {
       //return { name: `level_${d.depth + 1}_${index + 1}-Child_1` };
-      return { name: Date.now().toString(36) + index };
+      return {
+        id: Date.now().toString(36) + index,
+        name: child.activity_name,
+      };
     });
     const newData = deepObjectSearchAndModify(data, d, modifyValue);
     setData({ ...newData });
   };
 
-  const getSearchData = (d) => {
+  const getSearchData = async (d) => {
     debugger;
+    const result = await fetchData();
     const newData = {
       ...data,
-      children: [1, 2, 3].map((child, index) => {
+      children: result.map((child, index) => {
         //return { name: `level_${d.depth + 1}_${index + 1}-Child_1` };
-        return { name: Date.now().toString(36) + index };
+        return {
+          id: Date.now().toString(36) + index,
+          name: child.activity_name,
+        };
       }),
     };
     setData(newData);
