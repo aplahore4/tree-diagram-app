@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import FlowChart from './charts/FlowChart';
-
-const dataset = {
-  name: 'Root',
-};
+import flowChartData from './data';
+import Example from './charts/Example';
 
 function getCurrentDimension() {
   return {
@@ -36,25 +34,39 @@ const apiResponse = [
   },
 ];
 
-function deepObjectSearchAndModify(obj, searchValue, modifyValue) {
-  for (const key in obj) {
-    if (typeof obj[key] === 'object') {
-      deepObjectSearchAndModify(obj[key], searchValue, modifyValue);
-    } else if (obj[key] === searchValue) {
-      obj['children'] = modifyValue;
+const children = apiResponse.map((d) => {
+  return { name: d.activity_name, ...d };
+});
+
+const chartAPIData = {
+  name: 'root',
+  children: children,
+};
+
+function findNode(data, key, value, newPropertyKey, newPropertyValue) {
+  if (data[key] === value) {
+    data[newPropertyKey] = JSON.parse(JSON.stringify(newPropertyValue));
+  } else if (data.children) {
+    for (var i = 0; i < data.children.length; i++) {
+      findNode(data.children[i], key, value, newPropertyKey, newPropertyValue);
     }
   }
-  return obj;
+  return data;
 }
 
 function App() {
-  //////////////////////////////////////////////
-  const [data, setData] = useState(null);
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
+  const [chartData, setChartData] = useState(chartAPIData);
+  // const [orgChartData, setOrgChartData] = useState();
 
-  useEffect(() => {
-    setData(dataset);
-  }, []);
+  const getMoreData = (d) => {
+    debugger;
+    console.log('chartData', chartData);
+    // console.log('orgChartData', orgChartData);
+    const newData = findNode(chartData, 'name', d.name, 'children', children);
+    // setOrgChartData(JSON.parse(JSON.stringify(orgChartData)));
+    setChartData({ ...newData });
+  };
 
   useEffect(() => {
     const updateDimension = () => {
@@ -67,37 +79,17 @@ function App() {
     };
   }, [screenSize]);
 
-  const getMoreData = (d) => {
-    debugger;
-    const modifyValue = [1, 2, 3].map((child, index) => {
-      //return { name: `level_${d.depth + 1}_${index + 1}-Child_1` };
-      return { name: Date.now().toString(36) + index };
-    });
-    const newData = deepObjectSearchAndModify(data, d, modifyValue);
-    setData({ ...newData });
-  };
-
-  const getSearchData = (d) => {
-    debugger;
-    const newData = {
-      ...data,
-      children: [1, 2, 3].map((child, index) => {
-        //return { name: `level_${d.depth + 1}_${index + 1}-Child_1` };
-        return { name: Date.now().toString(36) + index };
-      }),
-    };
-    setData(newData);
-  };
-
-  if (data === null) return <></>;
+  useEffect(() => {
+    // setOrgChartData(JSON.parse(JSON.stringify(chartAPIData)));
+  }, []);
 
   return (
     <div className='App'>
+      {/* <Example /> */}
       <FlowChart
         dimensions={screenSize}
-        data={data}
+        data={JSON.parse(JSON.stringify(chartData))}
         getMoreData={getMoreData}
-        getSearchData={getSearchData}
       />
     </div>
   );

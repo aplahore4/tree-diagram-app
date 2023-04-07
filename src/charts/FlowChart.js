@@ -1,23 +1,13 @@
 import React, { useRef, useEffect } from 'react';
-import { select, zoom, tree, hierarchy, linkVertical } from 'd3';
+import { select, zoom, tree, hierarchy, linkVertical, cluster } from 'd3';
 
-const FlowChart = ({ dimensions, getMoreData }) => {
-  const data = {
-    name: 'A',
-    children: [
-      {
-        name: 'B',
-        children: [{ name: 'D' }, { name: 'E' }],
-      },
-      { name: 'C' },
-    ],
-  };
+const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
   const svgRef = useRef(null);
   const { width, height, margin } = dimensions;
   const svgWidth = width + margin.left + margin.right;
   const svgHeight = height + margin.top + margin.bottom;
   const duration = 750,
-    rectW = 190,
+    rectW = 100,
     rectH = 100;
 
   useEffect(() => {
@@ -26,11 +16,11 @@ const FlowChart = ({ dimensions, getMoreData }) => {
     svgEl.selectAll('*').remove(); // Clear svg content before adding new elements
 
     const moreHandler = (d) => {
-      alert('moreHandler');
+      getMoreData(d);
     };
 
-    const searchHandler = () => {
-      alert('searchHandler');
+    const searchHandler = (d) => {
+      getSearchData(d);
     };
 
     const zoomBehavior = zoom();
@@ -42,13 +32,16 @@ const FlowChart = ({ dimensions, getMoreData }) => {
 
     const treeMapLayout = tree()
       .nodeSize([rectW, rectH])
-      .size([width, height - rectH]);
+      .size([width, height - rectH])
+      .separation(function separation(a, b) {
+        return 0.00000001;
+      });
 
     const root = hierarchy(data);
 
     const link_Vertical = linkVertical()
       .x((d) => {
-        return d.x + rectW / 2;
+        return d.x;
       })
       .y((d) => {
         return d.y;
@@ -76,7 +69,7 @@ const FlowChart = ({ dimensions, getMoreData }) => {
       .join('g')
       .attr('class', 'node')
       .attr('transform', (d) => {
-        return `translate(${d.x},${d.y})`;
+        return `translate(${d.x - rectW / 2},${d.y})`;
       });
 
     const foreignObjectElement = node
@@ -93,7 +86,7 @@ const FlowChart = ({ dimensions, getMoreData }) => {
       .text(function (d) {
         return d.data.name;
       })
-      .style('margin', '10px');
+      .style('margin', '5px');
 
     foreignObjectElement
       .append('xhtml:span')
@@ -101,7 +94,14 @@ const FlowChart = ({ dimensions, getMoreData }) => {
       .style('margin', 'margin:0 0 10px 10px')
       .style('border', '1px solid red')
       .style('cursor', 'pointer')
-      .on('click', moreHandler);
+      .attr('data', function (d) {
+        return d.data.name;
+        // return JSON.stringify({ ...d.data, depth: d.depth });
+      })
+      .on('click', function () {
+        moreHandler(select(this).attr('data'));
+        // moreHandler(JSON.parse(select(this).attr('data')));
+      });
 
     const parent_node = svg
       .selectAll('.parent_node')
@@ -109,7 +109,7 @@ const FlowChart = ({ dimensions, getMoreData }) => {
       .join('g')
       .attr('class', 'node')
       .attr('transform', (d) => {
-        return `translate(${d.x},${d.y})`;
+        return `translate(${d.x - rectW / 2},${d.y})`;
       });
 
     const parent_foreignObjectElement = parent_node
@@ -124,7 +124,8 @@ const FlowChart = ({ dimensions, getMoreData }) => {
     parent_foreignObjectElement
       .append('xhtml:input')
       .attr('type', 'text')
-      .style('margin', '10px');
+      .style('width', '80px')
+      .style('margin', '5px');
 
     parent_foreignObjectElement
       .append('xhtml:span')
@@ -132,7 +133,14 @@ const FlowChart = ({ dimensions, getMoreData }) => {
       .style('margin', 'margin:0 0 10px 10px')
       .style('border', '1px solid red')
       .style('cursor', 'pointer')
-      .on('click', searchHandler);
+      .attr('data', function (d) {
+        return d.data.name;
+        // return JSON.stringify({ ...d.data, depth: d.depth });
+      })
+      .on('click', function () {
+        searchHandler(select(this).attr('data'));
+        //searchHandler(JSON.parse(select(this).attr('data')));
+      });
 
     //Redraw for zoom
     function redraw(event) {
@@ -143,7 +151,16 @@ const FlowChart = ({ dimensions, getMoreData }) => {
         'translate(' + translate + ') scale(' + scale + ')'
       );
     }
-  }, [data, height, width, margin.left, margin.top, margin.bottom]); // Redraw chart if data changes
+  }, [
+    data,
+    height,
+    width,
+    margin.left,
+    margin.top,
+    margin.bottom,
+    getMoreData,
+    getSearchData,
+  ]); // Redraw chart if data changes
 
   return <svg ref={svgRef} width={svgWidth} height={svgHeight} />;
 };
