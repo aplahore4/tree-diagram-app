@@ -7,8 +7,8 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
   const svgWidth = width + margin.left + margin.right;
   const svgHeight = height + margin.top + margin.bottom;
   const duration = 750,
-    rectW = 100,
-    rectH = 100;
+    rectW = 250,
+    rectH = 250;
 
   useEffect(() => {
     // Create root container where we will append all other chart elements
@@ -78,10 +78,15 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .attr('height', rectH)
       .append('xhtml:div')
       .attr('class', 'nod_div')
-      .style('border', '1px solid #800080')
+      .style('border', '1px solid rgb(128, 0, 128)')
       .style('background', 'white')
       .style('font-size', '12px')
-      .style('font-family', 'Calibri');
+      .style('font-family', 'Calibri')
+      .style('width', '15%')
+      .style('height', '100px')
+      .style('display', 'table')
+      .style('min-width', '205px')
+      .style('max-width', '205px');
 
     foreignObjectElement
       .append('xhtml:div')
@@ -93,10 +98,14 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
     foreignObjectElement
       .append('xhtml:span')
       .text('Show More')
-      .style('padding', '1px')
-      // .style('float', 'right')
-      .style('border', '1px solid #800080')
+      .style('border', '1px solid rgb(128, 0, 128)')
       .style('cursor', 'pointer')
+      .style('display', 'table')
+      // .style('width', '30px')
+      .style('padding', '5px')
+      .style('margin-left', '130px')
+      // .style('margin-right', '15px')
+      .style('margin-top', '55px')
       .attr('data', function (d) {
         return d.data.id;
         // return JSON.stringify({ ...d.data, depth: d.depth });
@@ -121,28 +130,38 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .attr('height', rectH)
       .append('xhtml:div')
       .attr('class', 'nod_div')
-      .style('border', '1px solid #800080')
+      .style('border', '1px solid rgb(128, 0, 128)')
       .style('background', 'white')
       .style('font-size', '12px')
-      .style('font-family', 'Calibri');
+      .style('font-family', 'Calibri')
+      .style('width', '15%')
+      .style('height', '100px')
+      .style('display', 'table')
+      .style('min-width', '205px')
+      .style('max-width', '205px');
 
     parent_foreignObjectElement
       .append('xhtml:input')
       .attr('type', 'text')
       .attr('placeholder', 'Search stuffs')
-      .style('width', '80px')
-      .style('margin', '5px')
+      .style('width', '85%')
+      .style('margin', '15px')
       .style('padding', '2px')
       .style('font-size', '12px')
-      .style('font-family', 'Calibri');
+      .style('font-family', 'Calibri')
+      .style('height', '30px')
+      .style('display', 'table-cell');
 
     parent_foreignObjectElement
       .append('xhtml:span')
       .text('Search')
-      .style('margin', '0 0 5px 5px')
-      .style('padding', '1px')
-      .style('border', '1px solid #800080')
+      .style('border', '1px solid rgb(128, 0, 128)')
       .style('cursor', 'pointer')
+      .style('display', 'table')
+      // .style('width', '30px')
+      .style('padding', '5px')
+      .style('margin-left', '153px')
+      // .style('margin-right', '15px')
       .attr('data', function (d) {
         return d.data.id;
         // return JSON.stringify({ ...d.data, depth: d.depth });
