@@ -31,11 +31,9 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
     const treeMapLayout = tree()
-      .nodeSize([rectW, rectH])
+      .nodeSize([60, rectH])
       .size([width, height - rectH])
-      .separation(function separation(a, b) {
-        return 1 / 100000000;
-      });
+      .separation(() => 1 / 100000000);
 
     const root = hierarchy(data);
 
@@ -82,7 +80,7 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .style('background', 'white')
       .style('font-size', '10px')
       .style('font-family', 'Calibri')
-      .style('width', '60px')
+      .style('width', '57px')
       // .style('height', '95px')
       .style('display', 'table');
     // .style('min-width', '205px')
@@ -93,7 +91,7 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .text(function (d) {
         return d.data.name;
       })
-      .style('margin', '0px');
+      .style('margin', '2px');
 
     foreignObjectElement
       .append('xhtml:span')
@@ -102,12 +100,12 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .style('cursor', 'pointer')
       .style('display', 'table')
       // .style('width', '30px')
-      .style('float', 'right')
+      // .style('float', 'right')
       .style('padding', '2px')
       // .style('margin-left', '130px')
-      .style('margin-right', '2px')
-      .style('margin-top', '2px')
-      .style('margin-bottom', '2px')
+      // .style('margin-right', '2px')
+      // .style('margin-top', '2px')
+      .style('margin', '2px')
       .attr('data', function (d) {
         return d.data.id;
         // return JSON.stringify({ ...d.data, depth: d.depth });
