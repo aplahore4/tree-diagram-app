@@ -7,8 +7,8 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
   const svgWidth = width + margin.left + margin.right;
   const svgHeight = height + margin.top + margin.bottom;
   const duration = 750,
-    rectW = 250,
-    rectH = 250;
+    rectW = 100,
+    rectH = 100;
 
   useEffect(() => {
     // Create root container where we will append all other chart elements
@@ -69,7 +69,7 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .join('g')
       .attr('class', 'node')
       .attr('transform', (d) => {
-        return `translate(${d.x - rectW / 2},${d.y})`;
+        return `translate(${d.x - 60 / 2},${d.y})`;
       });
 
     const foreignObjectElement = node
@@ -80,13 +80,13 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .attr('class', 'nod_div')
       .style('border', '1px solid rgb(128, 0, 128)')
       .style('background', 'white')
-      .style('font-size', '12px')
+      .style('font-size', '10px')
       .style('font-family', 'Calibri')
-      .style('width', '15%')
-      .style('height', '100px')
-      .style('display', 'table')
-      .style('min-width', '205px')
-      .style('max-width', '205px');
+      .style('width', '60px')
+      // .style('height', '95px')
+      .style('display', 'table');
+    // .style('min-width', '205px')
+    // .style('max-width', '205px');
 
     foreignObjectElement
       .append('xhtml:div')
@@ -102,10 +102,12 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .style('cursor', 'pointer')
       .style('display', 'table')
       // .style('width', '30px')
-      .style('padding', '5px')
-      .style('margin-left', '130px')
-      // .style('margin-right', '15px')
-      .style('margin-top', '55px')
+      .style('float', 'right')
+      .style('padding', '2px')
+      // .style('margin-left', '130px')
+      .style('margin-right', '2px')
+      .style('margin-top', '2px')
+      .style('margin-bottom', '2px')
       .attr('data', function (d) {
         return d.data.id;
         // return JSON.stringify({ ...d.data, depth: d.depth });
@@ -132,24 +134,24 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .attr('class', 'nod_div')
       .style('border', '1px solid rgb(128, 0, 128)')
       .style('background', 'white')
-      .style('font-size', '12px')
+      .style('font-size', '10px')
       .style('font-family', 'Calibri')
-      .style('width', '15%')
-      .style('height', '100px')
-      .style('display', 'table')
-      .style('min-width', '205px')
-      .style('max-width', '205px');
+      // .style('width', rectW + 'px')
+      // .style('height', rectH + 'px')
+      .style('display', 'table');
+    // .style('min-width', '205px')
+    // .style('max-width', '205px');
 
     parent_foreignObjectElement
       .append('xhtml:input')
       .attr('type', 'text')
       .attr('placeholder', 'Search stuffs')
-      .style('width', '85%')
-      .style('margin', '15px')
+      .style('width', '87px')
+      .style('margin', '2px')
       .style('padding', '2px')
-      .style('font-size', '12px')
+      .style('font-size', '11px')
       .style('font-family', 'Calibri')
-      .style('height', '30px')
+      // .style('height', '30px')
       .style('display', 'table-cell');
 
     parent_foreignObjectElement
@@ -159,9 +161,10 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .style('cursor', 'pointer')
       .style('display', 'table')
       // .style('width', '30px')
-      .style('padding', '5px')
-      .style('margin-left', '153px')
-      // .style('margin-right', '15px')
+      .style('float', 'right')
+      .style('padding', '2px')
+      .style('margin-right', '2px')
+      .style('margin-bottom', '2px')
       .attr('data', function (d) {
         return d.data.id;
         // return JSON.stringify({ ...d.data, depth: d.depth });

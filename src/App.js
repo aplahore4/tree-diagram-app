@@ -56,7 +56,7 @@ function App() {
   }, []);
 
   const getMoreData = async (d) => {
-    debugger;
+    // debugger;
     const result = await fetchData();
     const modifyValue = result.map((child, index) => {
       //return { name: `level_${d.depth + 1}_${index + 1}-Child_1` };
@@ -70,7 +70,7 @@ function App() {
   };
 
   const getSearchData = async (d) => {
-    debugger;
+    // debugger;
     const result = await fetchData();
     const newData = {
       ...data,
