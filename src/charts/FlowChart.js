@@ -42,7 +42,7 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
         return d.x;
       })
       .y((d) => {
-        return d.y;
+        return (d.y = d.depth * 180);
       });
 
     treeMapLayout(root);
