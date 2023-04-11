@@ -121,7 +121,7 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
       .join('g')
       .attr('class', 'node')
       .attr('transform', (d) => {
-        return `translate(${d.x - rectW / 2},${d.y})`;
+        return `translate(${d.x - rectW / 2 + 2},${d.y})`;
       });
 
     const parent_foreignObjectElement = parent_node
