@@ -126,7 +126,7 @@ const FlowChart = ({ data, dimensions, getMoreData, getSearchData }) => {
 
     const parent_foreignObjectElement = parent_node
       .append('foreignObject')
-      .attr('width', rectW)
+      .attr('width', rectW + 2)
       .attr('height', rectH)
       .append('xhtml:div')
       .attr('class', 'nod_div')
